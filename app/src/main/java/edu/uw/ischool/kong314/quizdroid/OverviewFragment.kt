@@ -22,7 +22,6 @@ class OverviewFragment : Fragment(R.layout.fragment_overview) {
 
         val title = arguments?.getString("title")
         val description = arguments?.getString("description")
-
         val titleTextView = view.findViewById<TextView>(R.id.titleTextView)
         val descriptionText = view.findViewById<TextView>(R.id.description)
         titleTextView.text = "$title Test Overview"
@@ -34,11 +33,13 @@ class OverviewFragment : Fragment(R.layout.fragment_overview) {
             val topicsArray = jsonObject.getJSONArray("topics")
             var question: String? = null
             var answers: ArrayList<String>? = null
+            var numQuestions = 0
             var correctAnswer: String? = null
             for (i in 0 until topicsArray.length()) {
                 val topicObject = topicsArray.getJSONObject(i)
                 if (topicObject.getString("title") == title) {
                     val questionsArray = topicObject.getJSONArray("questions")
+                    numQuestions = questionsArray.length()
                     val firstQuestionObject = questionsArray.getJSONObject(0)
                     question = firstQuestionObject.getString("question")
                     answers = ArrayList()
@@ -50,6 +51,7 @@ class OverviewFragment : Fragment(R.layout.fragment_overview) {
                 }
             }
             val questionFragment = QuestionFragment()
+            Log.d("fromoverview", numQuestions.toString())
             val args = Bundle().apply {
                 putString("title", title)
                 putString("question", question)
@@ -57,6 +59,7 @@ class OverviewFragment : Fragment(R.layout.fragment_overview) {
                 putString("correctAnswer", correctAnswer)
                 putInt("qNum", 1)
                 putInt("numCorrect", 0)
+                putInt("totalQuestions", numQuestions)
             }
             Log.d("CHECKINGBACKSTACK", requireActivity().supportFragmentManager.backStackEntryCount.toString())
             questionFragment.arguments = args

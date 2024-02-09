@@ -14,7 +14,6 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 
 class MainActivity : AppCompatActivity() {
-    private var isFragmentVisible = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -33,8 +32,6 @@ class MainActivity : AppCompatActivity() {
             button.setBackgroundColor(0xFFbe03fc.toInt())
             container.addView(button)
             button.setOnClickListener() {
-                container.visibility = View.INVISIBLE
-                isFragmentVisible = true
                 val fragment = OverviewFragment()
                 val args = Bundle().apply {
                     putString("title", title)
@@ -47,16 +44,12 @@ class MainActivity : AppCompatActivity() {
                     .commit()
             }
         }
-
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun onBackPressed() {
-        if (isFragmentVisible) {
-            isFragmentVisible = false
-            findViewById<ViewGroup>(R.id.buttonContainer).visibility = View.VISIBLE
-        } else {
-            super.onBackPressed()
+        supportFragmentManager.addOnBackStackChangedListener {
+            container.visibility = if (supportFragmentManager.backStackEntryCount == 0) {
+                View.VISIBLE
+            } else {
+                View.INVISIBLE
+            }
         }
     }
 

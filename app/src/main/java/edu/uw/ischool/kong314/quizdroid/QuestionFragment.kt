@@ -2,14 +2,13 @@ package edu.uw.ischool.kong314.quizdroid
 
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Button
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 
 class QuestionFragment : Fragment(R.layout.fragment_question) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -21,6 +20,8 @@ class QuestionFragment : Fragment(R.layout.fragment_question) {
         val correctAnswer = arguments?.getString("correctAnswer")
         val qNum = arguments?.getInt("qNum")
         var numCorrect = arguments?.getInt("numCorrect")
+        val numQuestions = arguments?.getInt("totalQuestions")
+        Log.d("fromquestions", numQuestions.toString())
 
         val questionNumber = view.findViewById<TextView>(R.id.qNum)
         val questionDesc = view.findViewById<TextView>(R.id.question)
@@ -46,6 +47,7 @@ class QuestionFragment : Fragment(R.layout.fragment_question) {
                 nextBtn.visibility = View.INVISIBLE
             }
         }
+
         nextBtn.setOnClickListener() {
             val questionFragment = AnswerFragment()
             val selectedRadioButton = view.findViewById<RadioButton>(radioGroup.checkedRadioButtonId)
@@ -58,6 +60,7 @@ class QuestionFragment : Fragment(R.layout.fragment_question) {
                 putString("correctAnswer", correctAnswer)
                 putInt("qNum", qNum!!)
                 putInt("numCorrect", numCorrect!!)
+                putInt("totalQuestions", numQuestions!!)
             }
             Log.d("CHECKINGBACKSTACK", requireActivity().supportFragmentManager.backStackEntryCount.toString())
             questionFragment.arguments = args
