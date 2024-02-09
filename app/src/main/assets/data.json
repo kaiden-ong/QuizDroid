@@ -1,0 +1,67 @@
+{
+  "topics": [
+    {
+      "title": "Math",
+      "description": "This is an overview of math topics.",
+      "questions": [
+        {
+          "question": "What is 2 + 2?",
+          "answers": ["3", "4", "5", "6"],
+          "correctAnswer": "4"
+        },
+        {
+          "question": "What is the square root of 16?",
+          "answers": ["2", "3", "4", "5"],
+          "correctAnswer": "4"
+        },
+        {
+          "question": "Solve for x: 2x + 5 = 15",
+          "answers": ["3", "4", "5", "6"],
+          "correctAnswer": "5"
+        }
+      ]
+    },
+    {
+      "title": "Physics",
+      "description": "This is an overview of physics topics.",
+      "questions": [
+        {
+          "question": "What is Newton's second law of motion?",
+          "answers": ["F = ma", "E = mc^2", "E = hf", "PV = nRT"],
+          "correctAnswer": "F = ma"
+        },
+        {
+          "question": "What is the formula for kinetic energy?",
+          "answers": ["1/2 * m * v^2", "mgh", "E = hf", "F = ma"],
+          "correctAnswer": "1/2 * m * v^2"
+        },
+        {
+          "question": "What is the unit of electric charge?",
+          "answers": ["Coulomb", "Ampere", "Volt", "Ohm"],
+          "correctAnswer": "Coulomb"
+        }
+      ]
+    },
+    {
+      "title": "Marvel Superheroes",
+      "description": "This is an overview of Marvel topics.",
+      "questions": [
+        {
+          "question": "Who is the alter ego of Spider-Man?",
+          "answers": ["Bruce Banner", "Tony Stark", "Peter Parker", "Matt Murdock"],
+          "correctAnswer": "Peter Parker"
+        },
+        {
+          "question": "What is the real name of Captain America?",
+          "answers": ["Steve Rogers", "Tony Stark", "Bruce Banner", "Clark Kent"],
+          "correctAnswer": "Steve Rogers"
+        },
+        {
+          "question": "What is Thor's hammer called?",
+          "answers": ["Stormbreaker", "Mjolnir", "Gungnir", "Excalibur"],
+          "correctAnswer": "Mjolnir"
+        }
+      ]
+    }
+  ]
+}

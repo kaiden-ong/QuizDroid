@@ -4,39 +4,82 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.util.Log
+import android.view.View
+import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.addCallback
+import org.json.JSONArray
+import org.json.JSONObject
+import java.io.BufferedReader
+import java.io.InputStreamReader
 
 class MainActivity : AppCompatActivity() {
+    private var isFragmentVisible = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val mathBtn = findViewById<Button>(R.id.mathBtn)
-        val physicsButton = findViewById<Button>(R.id.physicsBtn)
-        val marvelButton = findViewById<Button>(R.id.marvelBtn)
+        val jsonString = loadJsonFromAsset("data.json")
+        val topics = parseJson(jsonString)
 
-        val mathFragment = MathFragment()
-        val physicsFragment = PhysicsFragment()
-        val marvelFragment = MarvelFragment()
-        Log.d("FromMain", "btns and fragments made")
-        mathBtn.setOnClickListener() {
-            supportFragmentManager.beginTransaction().apply {
-                replace(R.id.fragmentContainer, mathFragment)
-                commit()
+        val container = findViewById<ViewGroup>(R.id.buttonContainer)
+        Log.d("FromMain", "Making btn")
+        topics.forEach { topic ->
+            val title = topic.title
+            val description = topic.description
+            val button = Button(this)
+            button.text = title
+            button.height = 100
+            button.setBackgroundColor(0xFFbe03fc.toInt())
+            container.addView(button)
+            button.setOnClickListener() {
+                container.visibility = View.INVISIBLE
+                isFragmentVisible = true
+                val fragment = OverviewFragment()
+                val args = Bundle().apply {
+                    putString("title", title)
+                    putString("description", description)
+                }
+                fragment.arguments = args
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragmentContainer, fragment)
+                    .addToBackStack(null)
+                    .commit()
             }
         }
 
-        physicsButton.setOnClickListener() {
-            supportFragmentManager.beginTransaction().apply {
-                replace(R.id.fragmentContainer, physicsFragment)
-                commit()
-            }
-        }
+    }
 
-        marvelButton.setOnClickListener() {
-            supportFragmentManager.beginTransaction().apply {
-                replace(R.id.fragmentContainer, marvelFragment)
-                commit()
-            }
+    @Deprecated("Deprecated in Java")
+    override fun onBackPressed() {
+        if (isFragmentVisible) {
+            isFragmentVisible = false
+            findViewById<ViewGroup>(R.id.buttonContainer).visibility = View.VISIBLE
+        } else {
+            super.onBackPressed()
         }
     }
+
+    private fun loadJsonFromAsset(fileName: String): String {
+        val reader = BufferedReader(InputStreamReader(assets.open(fileName)))
+        return reader.use { it.readText() }
+    }
+
+    private fun parseJson(jsonString: String): List<Topic> {
+        val topics = mutableListOf<Topic>()
+        val jsonObject = JSONObject(jsonString)
+        val topicsArray = jsonObject.getJSONArray("topics")
+        for (i in 0 until topicsArray.length()) {
+            val topicObject = topicsArray.getJSONObject(i)
+            val title = topicObject.getString("title")
+            val description = topicObject.getString("description")
+            topics.add(Topic(title, description))
+        }
+        return topics
+    }
 }
+
+data class Topic(
+    val title: String,
+    val description: String,
+)
