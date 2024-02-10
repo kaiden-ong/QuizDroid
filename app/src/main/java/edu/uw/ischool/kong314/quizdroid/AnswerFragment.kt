@@ -74,6 +74,7 @@ class AnswerFragment : Fragment(R.layout.fragment_answer) {
                 questionFragment.arguments = args
                 val transaction = requireActivity().supportFragmentManager.beginTransaction()
                 transaction.replace(R.id.fragmentContainer, questionFragment)
+                transaction.addToBackStack(null)
                 transaction.commit()
             }
         }
