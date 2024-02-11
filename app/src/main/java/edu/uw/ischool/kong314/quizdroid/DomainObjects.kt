@@ -1,6 +1,5 @@
 package edu.uw.ischool.kong314.quizdroid
 
-
 data class Question(
     val questionText: String,
     val answers: List<String>,

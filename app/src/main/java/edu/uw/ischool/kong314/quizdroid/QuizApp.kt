@@ -1,12 +1,12 @@
 package edu.uw.ischool.kong314.quizdroid
 
-import android.app.Application
 import android.util.Log
 
-class QuizApp : Application() {
-    val topicRepository: TopicRepository by lazy { TempTopicRepository() }
+class QuizApp : android.app.Application() {
+    lateinit var topicRepository: TopicRepository
     override fun onCreate() {
         super.onCreate()
-        Log.d("QuizApp", "Application started")
+        Log.d("FromQuizApp", "Application started")
+        topicRepository = TempTopicRepository()
     }
 }
