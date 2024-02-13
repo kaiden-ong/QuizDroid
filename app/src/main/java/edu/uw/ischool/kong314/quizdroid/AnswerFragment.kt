@@ -12,22 +12,25 @@ import androidx.fragment.app.FragmentManager
 import org.json.JSONObject
 
 
-class AnswerFragment : Fragment(R.layout.fragment_answer) {
+class AnswerFragment(private val topics: List<Topic>) : Fragment(R.layout.fragment_answer) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val title = arguments?.getString("title")
-        val question = arguments?.getString("question")
-        val correctAnswer = arguments?.getString("correctAnswer")
+        var question = arguments?.getString("question")
+        var answers = arguments?.getStringArrayList("answers")
+        var correctAnswer = arguments?.getInt("correctAnswer")
         val qNum = arguments?.getInt("qNum")
-        var numCorrect = arguments?.getInt("numCorrect")
+        val numCorrect = arguments?.getInt("numCorrect")
         val numQuestions = arguments?.getInt("totalQuestions")
+
+        val correctAnswerText = answers!![correctAnswer!!]
 
         val questionNumber = view.findViewById<TextView>(R.id.qNumAns)
         val correct = view.findViewById<TextView>(R.id.correctAnswer)
         val ratioCorrect = view.findViewById<TextView>(R.id.numCorrect)
 
         questionNumber.text = "$title Question #$qNum"
-        correct.text = "The correct answer was \"$correctAnswer\"."
+        correct.text = "The correct answer was \"$correctAnswerText\"."
         ratioCorrect.text = "You have gotten $numCorrect out of $qNum correct."
         Log.d("CHECKINGPARAMS", "num correct: $numCorrect, num questions: $numQuestions, qNum: $qNum")
         val button = view.findViewById<Button>(R.id.nextQuestion)
@@ -42,32 +45,22 @@ class AnswerFragment : Fragment(R.layout.fragment_answer) {
             }
         } else {
             button.setOnClickListener() {
-                val jsonObject = JSONObject(loadJsonFromAsset(requireContext(), "data.json"))
-                val topicsArray = jsonObject.getJSONArray("topics")
-                var question: String? = null
-                var answers: ArrayList<String>? = null
-                var correctAnswer: String? = null
-                for (i in 0 until topicsArray.length()) {
-                    val topicObject = topicsArray.getJSONObject(i)
-                    if (topicObject.getString("title") == title) {
-                        val questionsArray = topicObject.getJSONArray("questions")
-                        val firstQuestionObject = questionsArray.getJSONObject(qNum!!)
-                        question = firstQuestionObject.getString("question")
-                        answers = ArrayList()
-                        for (j in 0 until firstQuestionObject.getJSONArray("answers").length()) {
-                            answers.add(firstQuestionObject.getJSONArray("answers").getString(j))
-                        }
-                        correctAnswer = firstQuestionObject.getString("correctAnswer")
-                        break
-                    }
-                }
-                val questionFragment = QuestionFragment()
+                Log.d("LateAnswer", "getting topic")
+                val topic = topics.find { it.title == title }
+                Log.d("LateAnswer", "getting question $qNum $question")
+                question = topic!!.questions[qNum!!].questionText
+                Log.d("LateAnswer", "getting answers")
+                answers = ArrayList(topic.questions[qNum].answers)
+                Log.d("LateAnswer", "getting correct")
+                correctAnswer = topic.questions[qNum].correctAnswerIndex
+
+                val questionFragment = QuestionFragment(topics)
                 val args = Bundle().apply {
                     putString("title", title)
                     putString("question", question)
                     putStringArrayList("answers", answers)
-                    putString("correctAnswer", correctAnswer)
-                    putInt("qNum", qNum!! + 1)
+                    putInt("correctAnswer", correctAnswer!!)
+                    putInt("qNum", qNum + 1)
                     putInt("numCorrect", numCorrect!!)
                     putInt("totalQuestions", numQuestions!!)
                 }
@@ -78,11 +71,5 @@ class AnswerFragment : Fragment(R.layout.fragment_answer) {
                 transaction.commit()
             }
         }
-    }
-}
-
-private fun loadJsonFromAsset(context: Context, fileName: String): String {
-    return context.assets.open(fileName).bufferedReader().use {
-        it.readText()
     }
 }

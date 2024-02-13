@@ -1,11 +1,15 @@
 package edu.uw.ischool.kong314.quizdroid
 
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.util.Log
+import android.util.TypedValue
+import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.addCallback
@@ -26,16 +30,34 @@ class MainActivity : AppCompatActivity() {
         topics.forEach { topic ->
             val title = topic.title
             val shortDescription = topic.shortDescription
+            val longDescription = topic.longDescription
             val button = Button(this)
             button.text = title
-            button.height = 100
-            button.setBackgroundColor(0xFFbe03fc.toInt())
+            button.layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            button.setBackgroundColor(Color.parseColor("#FF673AB7"))
+            button.setTextColor(Color.WHITE)
+            button.textSize = 24f
+            button.setPadding(16, 16, 16, 16)
             container.addView(button)
+            val desc = TextView(this)
+            desc.text = shortDescription
+            desc.layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            desc.setTextColor(Color.parseColor("#FF000000"))
+            desc.textSize = 16f // Set description text size
+            desc.gravity = Gravity.CENTER_HORIZONTAL
+            desc.setPadding(16, 8, 16, 75)
+            container.addView(desc)
             button.setOnClickListener() {
-                val fragment = OverviewFragment()
+                val fragment = OverviewFragment(topics)
                 val args = Bundle().apply {
                     putString("title", title)
-                    putString("description", shortDescription)
+                    putString("longDesc", longDescription)
                 }
                 fragment.arguments = args
                 supportFragmentManager.beginTransaction()

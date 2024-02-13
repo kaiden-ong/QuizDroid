@@ -10,14 +10,14 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 
-class QuestionFragment : Fragment(R.layout.fragment_question) {
+class QuestionFragment(private val topics: List<Topic>) : Fragment(R.layout.fragment_question) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         val title = arguments?.getString("title")
         val question = arguments?.getString("question")
         val answers = arguments?.getStringArrayList("answers")
-        val correctAnswer = arguments?.getString("correctAnswer")
+        val correctAnswer = arguments?.getInt("correctAnswer")
         val qNum = arguments?.getInt("qNum")
         var numCorrect = arguments?.getInt("numCorrect")
         val numQuestions = arguments?.getInt("totalQuestions")
@@ -40,7 +40,9 @@ class QuestionFragment : Fragment(R.layout.fragment_question) {
         }
 
         val nextBtn = view.findViewById<Button>(R.id.button)
+        var radioSelected = -1
         radioGroup.setOnCheckedChangeListener { _, checkedId ->
+            radioSelected = checkedId
             if (checkedId != -1) {
                 nextBtn.visibility = View.VISIBLE
             } else {
@@ -49,15 +51,16 @@ class QuestionFragment : Fragment(R.layout.fragment_question) {
         }
 
         nextBtn.setOnClickListener() {
-            val questionFragment = AnswerFragment()
+            val questionFragment = AnswerFragment(topics)
             val selectedRadioButton = view.findViewById<RadioButton>(radioGroup.checkedRadioButtonId)
-            if (correctAnswer == selectedRadioButton.text.toString()) {
+            if (correctAnswer == radioSelected) {
                 numCorrect = numCorrect!! + 1
             }
             val args = Bundle().apply {
                 putString("title", title)
                 putString("question", question)
-                putString("correctAnswer", correctAnswer)
+                putStringArrayList("answers", answers)
+                putInt("correctAnswer", correctAnswer!!)
                 putInt("qNum", qNum!!)
                 putInt("numCorrect", numCorrect!!)
                 putInt("totalQuestions", numQuestions!!)
