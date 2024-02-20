@@ -7,12 +7,18 @@ import android.widget.Button
 import android.util.Log
 import android.util.TypedValue
 import android.view.Gravity
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.addCallback
+import androidx.preference.PreferenceManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.BufferedReader
@@ -22,48 +28,57 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        setSupportActionBar(findViewById(R.id.toolbar))
+
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        val editor = sharedPreferences.edit()
+        editor.clear()
+        editor.apply()
 
         val quizApp = application as QuizApp
-        val topics = quizApp.topicRepository.getTopics()
         val container = findViewById<ViewGroup>(R.id.buttonContainer)
-        Log.d("FromMain", "Making btn")
-        topics.forEach { topic ->
-            val title = topic.title
-            val shortDescription = topic.shortDescription
-            val longDescription = topic.longDescription
-            val button = Button(this)
-            button.text = title
-            button.layoutParams = ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-            button.setBackgroundColor(Color.parseColor("#FF673AB7"))
-            button.setTextColor(Color.WHITE)
-            button.textSize = 24f
-            button.setPadding(16, 16, 16, 16)
-            container.addView(button)
-            val desc = TextView(this)
-            desc.text = shortDescription
-            desc.layoutParams = ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-            desc.setTextColor(Color.parseColor("#FF000000"))
-            desc.textSize = 16f // Set description text size
-            desc.gravity = Gravity.CENTER_HORIZONTAL
-            desc.setPadding(16, 8, 16, 75)
-            container.addView(desc)
-            button.setOnClickListener() {
-                val fragment = OverviewFragment(topics)
-                val args = Bundle().apply {
-                    putString("title", title)
-                    putString("longDesc", longDescription)
+        CoroutineScope(Dispatchers.Main).launch {
+            val topics = quizApp.topicRepository.getTopics()
+            Log.d("FromMain", "Making btn")
+            for (topic in topics) {
+                Log.d("ParsedTopic", topic.toString())
+                val title = topic.title
+                val shortDescription = topic.shortDescription
+                val longDescription = topic.longDescription
+                val button = Button(this@MainActivity)
+                button.text = title
+                button.layoutParams = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+                button.setBackgroundColor(Color.parseColor("#FF673AB7"))
+                button.setTextColor(Color.WHITE)
+                button.textSize = 24f
+                button.setPadding(16, 16, 16, 16)
+                container.addView(button)
+                val desc = TextView(this@MainActivity)
+                desc.text = shortDescription
+                desc.layoutParams = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+                desc.setTextColor(Color.parseColor("#FF000000"))
+                desc.textSize = 16f // Set description text size
+                desc.gravity = Gravity.CENTER_HORIZONTAL
+                desc.setPadding(16, 8, 16, 75)
+                container.addView(desc)
+                button.setOnClickListener() {
+                    val fragment = OverviewFragment(topics)
+                    val args = Bundle().apply {
+                        putString("title", title)
+                        putString("longDesc", longDescription)
+                    }
+                    fragment.arguments = args
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.fragmentContainer, fragment)
+                        .addToBackStack(null)
+                        .commit()
                 }
-                fragment.arguments = args
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.fragmentContainer, fragment)
-                    .addToBackStack(null)
-                    .commit()
             }
         }
         supportFragmentManager.addOnBackStackChangedListener {
@@ -72,6 +87,24 @@ class MainActivity : AppCompatActivity() {
             } else {
                 View.INVISIBLE
             }
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.preferences, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.preferences -> {
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragmentContainer, PreferencesFragment())
+                    .addToBackStack(null)
+                    .commit()
+                return true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
     }
 }

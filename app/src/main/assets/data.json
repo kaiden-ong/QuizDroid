@@ -1,67 +1,65 @@
-{
-  "topics": [
-    {
-      "title": "Math",
-      "description": "This is an overview of math topics.",
-      "questions": [
-        {
-          "question": "What is 2 + 2?",
-          "answers": ["3", "4", "5", "6"],
-          "correctAnswer": 1
-        },
-        {
-          "question": "What is the square root of 16?",
-          "answers": ["2", "3", "4", "5"],
-          "correctAnswer": 2
-        },
-        {
-          "question": "Solve for x: 2x + 5 = 15",
-          "answers": ["3", "4", "5", "6"],
-          "correctAnswer": 3
-        }
-      ]
-    },
-    {
-      "title": "Physics",
-      "description": "This is an overview of physics topics.",
-      "questions": [
-        {
-          "question": "What is Newton's second law of motion?",
-          "answers": ["F = ma", "E = mc^2", "E = hf", "PV = nRT"],
-          "correctAnswer": 0
-        },
-        {
-          "question": "What is the formula for kinetic energy?",
-          "answers": ["1/2 * m * v^2", "mgh", "E = hf", "F = ma"],
-          "correctAnswer": 0
-        },
-        {
-          "question": "What is the unit of electric charge?",
-          "answers": ["Coulomb", "Ampere", "Volt", "Ohm"],
-          "correctAnswer": 0
-        }
-      ]
-    },
-    {
-      "title": "Marvel Superheroes",
-      "description": "This is an overview of Marvel topics.",
-      "questions": [
-        {
-          "question": "Who is the alter ego of Spider-Man?",
-          "answers": ["Bruce Banner", "Tony Stark", "Peter Parker", "Matt Murdock"],
-          "correctAnswer": 2
-        },
-        {
-          "question": "What is the real name of Captain America?",
-          "answers": ["Steve Rogers", "Tony Stark", "Bruce Banner", "Clark Kent"],
-          "correctAnswer": 0
-        },
-        {
-          "question": "What is Thor's hammer called?",
-          "answers": ["Stormbreaker", "Mjolnir", "Gungnir", "Excalibur"],
-          "correctAnswer": 1
-        }
-      ]
-    }
-  ]
-}
+[
+  { "title":"Science!",
+    "desc":"Because SCIENCE!",
+    "questions":[
+      {
+        "text":"What is fire?",
+        "answer":"1",
+        "answers":[
+          "One of the four classical elements",
+          "A magical reaction given to us by God",
+          "A band that hasn't yet been discovered",
+          "Fire! Fire! Fire! heh-heh"
+        ]
+      }
+    ]
+  },
+  { "title":"Marvel Super Heroes", "desc": "Avengers, Assemble!",
+    "questions":[
+      {
+        "text":"Who is Iron Man?",
+        "answer":"1",
+        "answers":[
+          "Tony Stark",
+          "Obadiah Stane",
+          "A rock hit by Megadeth",
+          "Nobody knows"
+        ]
+      },
+      {
+        "text":"Who founded the X-Men?",
+        "answer":"2",
+        "answers":[
+          "Tony Stark",
+          "Professor X",
+          "The X-Institute",
+          "Erik Lensherr"
+        ]
+      },
+      {
+        "text":"How did Spider-Man get his powers?",
+        "answer":"1",
+        "answers":[
+          "He was bitten by a radioactive spider",
+          "He ate a radioactive spider",
+          "He is a radioactive spider",
+          "He looked at a radioactive spider"
+        ]
+      }
+    ]
+  },
+  { "title":"Mathematics", "desc":"Did you pass the third grade?",
+    "questions":[
+      {
+        "text":"What is 2+2?",
+        "answer":"1",
+        "answers":[
+          "4",
+          "22",
+          "An irrational number",
+          "Nobody knows"
+        ]
+      }
+    ]
+  }
+]

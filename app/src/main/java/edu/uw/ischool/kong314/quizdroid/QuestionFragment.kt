@@ -33,7 +33,7 @@ class QuestionFragment(private val topics: List<Topic>) : Fragment(R.layout.frag
                 Log.d("fromquestionfragment", "try to insert")
                 val radioButton = RadioButton(requireContext())
                 radioButton.text = answers[i]
-                radioButton.textSize = 24F
+                radioButton.textSize = 18F
                 radioButton.id = i
                 radioGroup.addView(radioButton)
             }

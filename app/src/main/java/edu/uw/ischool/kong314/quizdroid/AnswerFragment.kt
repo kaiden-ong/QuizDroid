@@ -59,7 +59,7 @@ class AnswerFragment(private val topics: List<Topic>) : Fragment(R.layout.fragme
                     putString("title", title)
                     putString("question", question)
                     putStringArrayList("answers", answers)
-                    putInt("correctAnswer", correctAnswer!!)
+                    putInt("correctAnswer", correctAnswer!! - 1)
                     putInt("qNum", qNum + 1)
                     putInt("numCorrect", numCorrect!!)
                     putInt("totalQuestions", numQuestions!!)

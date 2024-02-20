@@ -34,7 +34,7 @@ class OverviewFragment(private val topics: List<Topic>) : Fragment(R.layout.frag
             val question: String = topic!!.questions[qNum].questionText
             val answers: ArrayList<String> = ArrayList(topic.questions[qNum].answers)
             val numQuestions = topic.questions.size
-            val correctAnswer: Int = topic.questions[qNum].correctAnswerIndex
+            val correctAnswer: Int = topic.questions[qNum].correctAnswerIndex - 1
             val questionFragment = QuestionFragment(topics)
             Log.d("fromoverview", numQuestions.toString())
             val args = Bundle().apply {
