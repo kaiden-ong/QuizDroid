@@ -1,57 +1,86 @@
 package edu.uw.ischool.kong314.quizdroid
 
+import android.app.Activity
+import android.app.AlertDialog
 import android.content.Context
+import android.content.Intent
+import android.provider.Settings
 import android.util.Log
+import android.widget.Toast
 import androidx.preference.PreferenceManager
-import java.io.BufferedReader
-import java.io.InputStreamReader
+import kotlinx.coroutines.CoroutineScope
 import org.json.JSONArray
-import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
-import java.util.concurrent.Executors
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledExecutorService
+import java.util.concurrent.TimeUnit
 
 class TempTopicRepository(private val context: Context, private val urlString: String) : TopicRepository {
+    private var isDownloading: Boolean = false
+
+    init {
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+        if (sharedPreferences.contains("duration")) {
+            startDownloadService()
+        }
+    }
     override suspend fun getTopics(): List<Topic> {
-        Log.d("fromrepo", "getting topics")
+
         return withContext(Dispatchers.IO) {
             val localFile = File(context.filesDir, "questions.json")
-            return@withContext downloadTopics(urlString, localFile)
+            return@withContext downloadTopics(urlString, localFile, context)
         }
     }
 
-    private suspend fun downloadTopics(urlString: String, localFile: File): List<Topic> {
+    private suspend fun downloadTopics(urlString: String, localFile: File, context: Context): List<Topic> {
+        isDownloading = true
         var newJsonString: String? = null
+        var success = false
         withContext(Dispatchers.IO) {
             try {
                 val connection = URL(urlString).openConnection() as HttpURLConnection
                 val inputStream = connection.inputStream
-                newJsonString = inputStream.bufferedReader().use { it.readText() }
+                val contentType = connection.contentType
+                if (contentType == "application/json") {
+                    newJsonString = inputStream.bufferedReader().use { it.readText() }
+                    success = true
+                } else {
+                    Log.e("TempTopicRepository", "Not a json file")
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
             }
         }
-
-        Log.d("fromRepo", "downloading")
-        if (newJsonString != null) {
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+        val editor = sharedPreferences.edit()
+        return if (success && newJsonString != null) {
+            editor.putBoolean("success", true)
+            editor.apply()
             saveFile(newJsonString!!, localFile)
-            return parseFromJson(newJsonString!!)
+            isDownloading = false
+            parseFromJson(newJsonString!!)
+        } else {
+            editor.putBoolean("success", false)
+            editor.apply()
+            isDownloading = false
+            if (localFile.exists()) {
+                readFile(localFile)
+            } else {
+                emptyList()
+            }
         }
-        if (localFile.exists()) {
-            return readFile(localFile)
-        }
-        return emptyList()
     }
 
     private fun parseFromJson(jsonString: String): List<Topic> {
         val topics = mutableListOf<Topic>()
         val jsonArray = JSONArray(jsonString)
-        Log.d("fromRepo", "to json")
         for (i in 0 until jsonArray.length()) {
             val jsonTopic = jsonArray.getJSONObject(i)
             val title = jsonTopic.getString("title")
@@ -77,7 +106,6 @@ class TempTopicRepository(private val context: Context, private val urlString: S
     }
 
     private fun saveFile(jsonString: String, localFile: File) {
-        Log.d("fromrepo", "saving file")
         FileOutputStream(localFile).use { outputStream ->
             outputStream.write(jsonString.toByteArray())
         }
@@ -93,5 +121,19 @@ class TempTopicRepository(private val context: Context, private val urlString: S
             }
         }
         return parseFromJson(stringBuilder.toString())
+    }
+
+    private fun startDownloadService() {
+        if (!isDownloading) {
+            val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+            val frequency = sharedPreferences.getString("duration", "")?.toLongOrNull() ?: return
+            val executor = Executors.newSingleThreadScheduledExecutor()
+            executor.scheduleAtFixedRate({
+                CoroutineScope(Dispatchers.Main).launch {
+                    Log.d("Downloadcheck", "downloading")
+                    getTopics()
+                }
+            }, 0, frequency, TimeUnit.MINUTES)
+        }
     }
 }
