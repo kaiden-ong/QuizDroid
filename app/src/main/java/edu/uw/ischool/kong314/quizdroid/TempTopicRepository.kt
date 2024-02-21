@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit
 
 class TempTopicRepository(private val context: Context, private val urlString: String) : TopicRepository {
     private var isDownloading: Boolean = false
-
+    private var executor: ScheduledExecutorService? = null
     init {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
         if (sharedPreferences.contains("duration")) {
@@ -124,16 +124,16 @@ class TempTopicRepository(private val context: Context, private val urlString: S
     }
 
     private fun startDownloadService() {
-        if (!isDownloading) {
-            val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
-            val frequency = sharedPreferences.getString("duration", "")?.toLongOrNull() ?: return
-            val executor = Executors.newSingleThreadScheduledExecutor()
-            executor.scheduleAtFixedRate({
-                CoroutineScope(Dispatchers.Main).launch {
-                    Log.d("Downloadcheck", "downloading")
-                    getTopics()
-                }
-            }, 0, frequency, TimeUnit.MINUTES)
-        }
+        executor?.shutdown() // Shut down the previous executor if it exists
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+        val frequency = sharedPreferences.getString("duration", "")!!.toLong()
+        executor = Executors.newSingleThreadScheduledExecutor()
+        Log.d("exec", executor.toString())
+        executor?.scheduleAtFixedRate({
+            CoroutineScope(Dispatchers.Main).launch {
+                Log.d("Downloadcheck", "downloading")
+                getTopics()
+            }
+        }, 0, frequency, TimeUnit.MINUTES)
     }
 }

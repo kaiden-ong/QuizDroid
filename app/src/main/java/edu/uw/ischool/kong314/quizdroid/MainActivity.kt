@@ -35,6 +35,7 @@ class MainActivity : AppCompatActivity(), PreferencesFragment.OnPreferencesChang
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         val editor = sharedPreferences.edit()
         editor.clear()
+        editor.remove("duration")
         editor.putString("quiz_url", "http://tednewardsandbox.site44.com/questions.json")
         editor.apply()
         Toast.makeText(this, sharedPreferences.getString("quiz_url", ""), Toast.LENGTH_SHORT).show()
