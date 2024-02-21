@@ -10,6 +10,6 @@ class QuizApp: android.app.Application() {
         Log.d("FromQuizApp", "Application started")
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         val quizUrl = sharedPreferences.getString("quiz_url", "")
-        topicRepository = TempTopicRepository(this, quizUrl ?: "http://tednewardsandbox.site44.com/questions.json")
+        topicRepository = TempTopicRepository(this, quizUrl ?: "")
     }
 }
