@@ -16,6 +16,21 @@ import androidx.annotation.RequiresApi
 import androidx.fragment.app.FragmentManager
 
 class PreferencesFragment : Fragment(R.layout.fragment_preferences) {
+    var listener: OnPreferencesChangedListener? = null
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is OnPreferencesChangedListener) {
+            listener = context
+        } else {
+            throw RuntimeException("$context must implement OnPreferencesChangedListener")
+        }
+    }
+
+    interface OnPreferencesChangedListener {
+        fun onPreferencesChanged()
+    }
+
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -31,12 +46,13 @@ class PreferencesFragment : Fragment(R.layout.fragment_preferences) {
         val duration = view.findViewById<TextView>(R.id.frequencyEditText)
         duration.text = savedDuration
 
-        button.setOnClickListener() {
+        button.setOnClickListener {
             val url = editTextUrl.text.toString()
             if (Regex(urlPattern).matches(url) && duration.text.toString().isNotEmpty()) {
                 editor.putString("quiz_url", url)
                 editor.putString("duration", duration.text.toString())
                 editor.apply()
+                listener?.onPreferencesChanged()
                 requireActivity().supportFragmentManager.popBackStack()
             } else {
                 Toast.makeText(requireContext(), "Please fill both fields with valid inputs.", Toast.LENGTH_SHORT).show()
